@@ -50,7 +50,13 @@ client.on("connect", () => {
 client.on("message", (topic, message) => {
   const payload = message.toString();
   console.log(`Mensagem recebida do tópico "${topic}": ${payload}`);
-  sendMessageToTelegram(payload);
+  if (payload.length > 1) {
+    console.log("Mensagem inválida");
+    return;
+  }
+  if (payload === "1") {
+    sendMessageToTelegram("Alguém está na porta!");
+  }
 });
 
 client.on("error", (error) => {
