@@ -2,7 +2,9 @@
   "name": "api-mqtt-telegram",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "commonjs",
   "scripts": {
+    "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -14,5 +16,8 @@
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
     "mqtt": "^5.13.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
   }
 }

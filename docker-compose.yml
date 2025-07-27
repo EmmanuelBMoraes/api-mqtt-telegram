@@ -1,0 +1,15 @@
+version: '3.7'
+
+services:
+  mosquitto:
+    image: eclipse-mosquitto
+    container_name: mosquitto-broker
+    restart: unless-stopped
+    ports:
+      - "1883:1883"
+    volumes:
+      # Este é o ponto chave:
+      # Mapeia a pasta de config do projeto para a pasta de config do container.
+      - ./config:/mosquitto/config
+      - ./data:/mosquitto/data
+      - ./log:/mosquitto/log
