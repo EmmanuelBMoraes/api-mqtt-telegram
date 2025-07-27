@@ -3,7 +3,11 @@
   "version": "1.0.0",
   "main": "index.js",
   "type": "commonjs",
+  "engines": {
+    "node": "20.x || 18.x || >=16.0.0"
+  },
   "scripts": {
+    "start": "node index.js",
     "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

@@ -8,8 +8,14 @@ services:
     ports:
       - "1883:1883"
     volumes:
-      # Este é o ponto chave:
-      # Mapeia a pasta de config do projeto para a pasta de config do container.
       - ./config:/mosquitto/config
-      - ./data:/mosquitto/data
-      - ./log:/mosquitto/log
+  api-telegram:
+    container_name: api-telegram
+    restart: unless-stopped
+    build: .
+    env_file:
+      - ./.env
+    ports:
+      - "${PORT}:${PORT}"
+    depends_on:
+      - mosquitto
