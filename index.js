@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const mqtt = require("mqtt");
 const axios = require("axios");
+const logger = require("./logger");
 
 // --- Configurações ---
 const PORT = process.env.PORT || 3000;
@@ -16,7 +17,7 @@ if (
   !TELEGRAM_BOT_TOKEN ||
   !TELEGRAM_CHAT_ID
 ) {
-  console.error(
+  logger.error(
     "Erro: Verifique se todas as variáveis de ambiente estão definidas no arquivo .env"
   );
   process.exit(1);
@@ -29,29 +30,29 @@ app.get("/status", (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Servidor de status rodando na porta ${PORT}`);
+  logger.info(`Servidor de status rodando na porta ${PORT}`);
 });
 
 // --- Cliente MQTT ---
-console.log(`Conectando ao broker MQTT em ${MQTT_BROKER_URL}`);
+logger.info(`Conectando ao broker MQTT em ${MQTT_BROKER_URL}`);
 const client = mqtt.connect(MQTT_BROKER_URL);
 
 client.on("connect", () => {
-  console.log("Conectado ao broker MQTT!");
+  logger.info("Conectado ao broker MQTT!");
   client.subscribe(MQTT_TOPIC, (err) => {
     if (!err) {
-      console.log(`Inscrito com sucesso no tópico: "${MQTT_TOPIC}"`);
+      logger.info(`Inscrito com sucesso no tópico: "${MQTT_TOPIC}"`);
     } else {
-      console.error("Erro ao se inscrever no tópico:", err);
+      logger.fatal("Erro ao se inscrever no tópico:", err);
     }
   });
 });
 
 client.on("message", (topic, message) => {
   const payload = message.toString();
-  console.log(`Mensagem recebida do tópico "${topic}": ${payload}`);
+  logger.info(`Mensagem recebida do tópico "${topic}": ${payload}`);
   if (payload.length > 1) {
-    console.log("Mensagem inválida");
+    logger.warn("Mensagem inválida");
     return;
   }
   if (payload === "1") {
@@ -60,24 +61,24 @@ client.on("message", (topic, message) => {
 });
 
 client.on("error", (error) => {
-  console.error("Erro no cliente MQTT:", error);
+  logger.fatal(error, "Erro no cliente MQTT");
   client.end();
 });
 
 async function sendMessageToTelegram(text) {
   const telegramApiUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
-  console.log("Enviando mensagem para o Telegram...");
+  logger.info("Enviando mensagem para o Telegram...");
   try {
     const response = await axios.post(telegramApiUrl, {
       chat_id: TELEGRAM_CHAT_ID,
       text: text,
       parse_mode: "Markdown",
     });
-    console.log("Mensagem enviada com sucesso ao Telegram:", response.data.ok);
+    logger.info("Mensagem enviada com sucesso ao Telegram:", response.data.ok);
   } catch (error) {
-    console.error(
-      "Erro ao enviar mensagem para o Telegram:",
-      error.response ? error.response.data : error.message
+    logger.error(
+      error.response ? error.response.data : error.message,
+      "Erro ao enviar mensagem para o Telegram:"
     );
   }
 }
