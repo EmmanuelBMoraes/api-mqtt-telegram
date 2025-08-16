@@ -48,7 +48,7 @@ client.on("connect", () => {
   });
 });
 
-client.on("message", (topic, message) => {
+client.on("message", async (topic, message) => {
   const payload = message.toString();
   logger.info(`Mensagem recebida do tópico "${topic}": ${payload}`);
   if (payload.length > 1) {
@@ -56,8 +56,11 @@ client.on("message", (topic, message) => {
     return;
   }
   if (payload === "1") {
-    sendMessageToTelegram("Alguém está na porta!");
+    sendMessageToTelegram(
+      process.env.CUSTOM_MESSAGE || "Alguém esta na porta!"
+    );
   }
+  await delay(process.env.DELAY_TIME || 200);
 });
 
 client.on("error", (error) => {
@@ -81,4 +84,8 @@ async function sendMessageToTelegram(text) {
       "Erro ao enviar mensagem para o Telegram:"
     );
   }
+}
+
+async function delay(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
